@@ -35,7 +35,7 @@ fun main() {
                     println("تعداد فالوورها: ${user.followers}")
                     println("تعداد دنبال‌شوندگان: ${user.following}")
                     println("تاریخ ایجاد حساب: ${user.createdAt}")
-                    println("ریپوزیتوری‌ها:")
+                    println("ریپوزیتوری‌ها:${user.repos}")
                     user.repos.forEach { println("- $it") }
                 } else {
                     println("کاربری با این نام یافت نشد.")

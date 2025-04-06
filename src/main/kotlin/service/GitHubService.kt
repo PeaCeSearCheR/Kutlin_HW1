@@ -6,6 +6,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+
 class GitHubService(private val api: GitHubApi) {
     private val usersCache = mutableMapOf<String, GitHubUser>()
 
@@ -15,25 +16,31 @@ class GitHubService(private val api: GitHubApi) {
             return usersCache[username]
         }
 
-        val call = api.getUserData(username)
-        return try {
-            val response = call.execute()
-            if (response.isSuccessful) {
-                val user = response.body()
-                user?.let {
-                    usersCache[username] = it
-                    println("داده‌های کاربر ذخیره شد.")
+        try {
+            val userResponse = api.getUserData(username).execute()
+            if (userResponse.isSuccessful) {
+                val user = userResponse.body()
+                if (user != null) {
+                    val reposResponse = api.getUserRepos(username).execute()
+                    val repos = if (reposResponse.isSuccessful) {
+                        reposResponse.body()?.map { it.name } ?: emptyList()
+                    } else {
+                        emptyList()
+                    }
+
+                    val completeUser = user.copy(repos = repos)
+                    usersCache[username] = completeUser
+                    println("داده‌های کاربر و ریپوزیتوری‌ها ذخیره شد.")
+                    return completeUser
                 }
-                user
-            } else {
-                println("پاسخ ناموفق از سرور: ${response.code()}")
-                null
             }
         } catch (e: Exception) {
-            println("خطا در ارتباط با سرور: ${e.message}")
-            null
+            println("خطا در دریافت اطلاعات کاربر: ${e.message}")
         }
-    }
+
+        return null
+
+}
 
     fun displayUsers() {
         if (usersCache.isEmpty()) {

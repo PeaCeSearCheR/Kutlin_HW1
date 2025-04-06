@@ -18,6 +18,5 @@ data class GitHubUser(
     var repos: List<String> = listOf()
 )
 
-data class Repo(
-    val name: String
-)
+data class Repo(val name: String)
+
